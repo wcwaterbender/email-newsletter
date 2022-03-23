@@ -11,7 +11,21 @@ path = "src/lib.rs"
 
 [dependencies]
 actix-web = "4"
+config = "0.11"
+serde = { version = "1", features = ["derive"]}
 tokio = "1.17.0"
+
+[dependencies.sqlx]
+version = "0.5.7"
+default-features = false
+features = [
+    "runtime-actix-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
 
 # Dev dependencies are used exclusively when running tests or examples
 # They do not get included in the final application binary!
