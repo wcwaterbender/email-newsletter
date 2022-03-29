@@ -24,6 +24,8 @@ rustup toolchain install nightly --allow-downgrade
 use reqwest for integration tests against public apis
  - choose random ports when testing
  - handle binding with a tcp listener
+
+use cargo-udeps to to scan for unused deps
  
 
 
