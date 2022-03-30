@@ -1,6 +1,6 @@
 use super::{SubscriberEmail, SubscriberName};
 
-pub struct NewSubsciber {
+pub struct NewSubscriber {
     pub email: SubscriberEmail,
     pub name: SubscriberName,
 }
