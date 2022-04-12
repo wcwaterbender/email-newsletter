@@ -4,16 +4,10 @@ use crate::helpers::spawn_app;
 async fn subscriber_returns_200_for_valid_form_data() {
     let app = spawn_app().await;
 
-    let client = reqwest::Client::new();
-
     let body = "name=sam%20cornish&email=totally_real_email69%40gmail.com";
-    let response = client
-        .post(&format!("{}/subscriptions", &app.address))
-        .header("Content-type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request.");
+
+    let response = app.post_subscriptions(body.into()).await;
+
     assert_eq!(200, response.status().as_u16());
 
     let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
@@ -28,7 +22,6 @@ async fn subscriber_returns_200_for_valid_form_data() {
 #[actix_web::test]
 async fn subscriber_returns_400_when_fields_are_present_but_empty() {
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=&email=totally_real_email69%40gmail.com", "empty name"),
         ("name=samwise&email=", "empty email"),
@@ -39,13 +32,7 @@ async fn subscriber_returns_400_when_fields_are_present_but_empty() {
     ];
 
     for (body, description) in test_cases {
-        let response = client
-            .post(&format!("{}/subscriptions", &app.address))
-            .header("Content-type", "application/x-www-form-urlencoded")
-            .body(body)
-            .send()
-            .await
-            .expect("Failed to execute request.");
+        let response = app.post_subscriptions(body.into()).await;
 
         assert_eq!(
             400,
@@ -59,7 +46,6 @@ async fn subscriber_returns_400_when_fields_are_present_but_empty() {
 #[actix_web::test]
 async fn subscriber_returns_400_when_data_is_malformed() {
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
 
     let test_cases = vec![
         ("name=sam%20cornish", "missing the email"),
@@ -68,13 +54,7 @@ async fn subscriber_returns_400_when_data_is_malformed() {
     ];
 
     for (malformed_body, error_message) in test_cases {
-        let response = client
-            .post(&format!("{}/subscriptions", &app.address))
-            .header("Content-type", "application/x-www-form-urlencoded")
-            .body(malformed_body)
-            .send()
-            .await
-            .expect("Failed to execute request.");
+        let response = app.post_subscriptions(malformed_body.into()).await;
         assert_eq!(
             400,
             response.status().as_u16(),
